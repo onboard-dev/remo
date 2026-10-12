@@ -16,6 +16,9 @@ private-words.txt
 Remo-demo.bat
 Remo-safe.bat
 
+# ---- 加工前のスクリーンショット (公開用は docs/ に置く) ----
+/remo_screenshot*.png
+
 # ---- Windows ----
 Thumbs.db
 desktop.ini

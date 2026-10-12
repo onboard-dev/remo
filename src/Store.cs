@@ -39,6 +39,8 @@ namespace Remo
         public float FontPt = 11f;
         public string FontName = "";
         public bool SideCollapsed;
+        public bool HasPos, PosMax;   // 終了時のウィンドウ位置
+        public int PosX, PosY;
     }
 
     // 接続情報はWindowsのDPAPI(ユーザー単位)で暗号化して保存する。マスターパスワードは不要。
@@ -80,6 +82,7 @@ namespace Remo
                         if (d.FontPt < 7 || d.FontPt > 36) d.FontPt = 11;
                         if (f.Length >= 5) d.FontName = U(f[4]);
                         if (f.Length >= 6) d.SideCollapsed = f[5] == "1";
+                        if (f.Length >= 9 && int.TryParse(f[6], out d.PosX) && int.TryParse(f[7], out d.PosY)) { d.HasPos = true; d.PosMax = f[8] == "1"; }
                         else d.FontPt = 11; // 旧形式: 既定値11ptへ
                     }
                 }
@@ -177,7 +180,8 @@ namespace Remo
                 StringBuilder sb = new StringBuilder();
                 sb.Append("REMO1\n");
                 foreach (Site s in d.Sites) sb.Append(SiteLine(s));
-                sb.Append("W\t" + d.WinW + "\t" + d.WinH + "\t" + d.FontPt.ToString(System.Globalization.CultureInfo.InvariantCulture) + "\t" + E(d.FontName) + "\t" + (d.SideCollapsed ? "1" : "0") + "\n");
+                sb.Append("W\t" + d.WinW + "\t" + d.WinH + "\t" + d.FontPt.ToString(System.Globalization.CultureInfo.InvariantCulture) + "\t" + E(d.FontName) + "\t" + (d.SideCollapsed ? "1" : "0")
+                    + (d.HasPos ? "\t" + d.PosX + "\t" + d.PosY + "\t" + (d.PosMax ? "1" : "0") : "") + "\n");
                 byte[] enc = ProtectedData.Protect(Encoding.UTF8.GetBytes(sb.ToString()), Entropy, DataProtectionScope.CurrentUser);
                 Directory.CreateDirectory(Dir);
                 string tmp = FilePath + ".tmp";

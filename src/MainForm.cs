@@ -46,6 +46,7 @@ namespace Remo
             MinimumSize = new Size(Theme.S(640), Theme.S(420));
             ClientSize = new Size(Theme.S(1040), Theme.S(660));
             if (data.WinW > 0 && data.WinH > 0) Size = new Size(data.WinW, data.WinH);
+            RestorePosition();
             try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { }
 
             Log.W("ctor: menu"); BuildMenu();
@@ -628,12 +629,43 @@ namespace Remo
             view.MarkDirty();
         }
 
+        // 前回終了したディスプレイに表示する(そのディスプレイが無ければ主ディスプレイ中央)
+        void RestorePosition()
+        {
+            if (!data.HasPos) return;
+            Point center = new Point(data.PosX + Width / 2, data.PosY + Height / 2);
+            Screen target = null;
+            foreach (Screen sc in Screen.AllScreens)
+                if (sc.Bounds.Contains(center) || sc.Bounds.Contains(new Point(data.PosX + 20, data.PosY + 20))) { target = sc; break; }
+            if (target == null) return;
+            Rectangle wa = target.WorkingArea;
+            int w = Math.Min(Width, wa.Width), h = Math.Min(Height, wa.Height);
+            int x = Math.Max(wa.Left, Math.Min(data.PosX, wa.Right - w));
+            int y = Math.Max(wa.Top, Math.Min(data.PosY, wa.Bottom - h));
+            StartPosition = FormStartPosition.Manual;
+            Bounds = new Rectangle(x, y, w, h);
+            if (data.PosMax) WindowState = FormWindowState.Maximized;
+        }
+
+        void SavePosition()
+        {
+            try
+            {
+                Rectangle b = WindowState == FormWindowState.Normal ? Bounds : RestoreBounds;
+                data.PosX = b.X; data.PosY = b.Y; data.HasPos = true;
+                data.PosMax = WindowState == FormWindowState.Maximized;
+                Store.Save(data);
+            }
+            catch { }
+        }
+
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             if (connected && MessageBox.Show(this, "接続中です。終了しますか?", "Remo", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             {
                 e.Cancel = true; return;
             }
+            SavePosition();
             base.OnFormClosing(e);
             try { if (client != null) client.Disconnect(); } catch { }
         }
