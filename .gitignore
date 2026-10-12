@@ -1,0 +1,21 @@
+# ---- ビルド成果物 (exe は GitHub Releases で配布) ----
+*.exe
+releases/
+*.bak
+*.pdb
+
+# ---- 個人情報・ローカルデータ (絶対にコミットしない) ----
+*.remo
+remo.dat*
+remo-log.txt
+remo-capture.bin
+*.log
+private-words.txt
+
+# ---- 不要になったファイル ----
+Remo-demo.bat
+Remo-safe.bat
+
+# ---- Windows ----
+Thumbs.db
+desktop.ini
