@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Remo" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#1A1B26</item>
+        <item name="android:statusBarColor">#16161E</item>
+        <item name="android:navigationBarColor">#16161E</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>
